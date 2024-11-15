@@ -1,0 +1,11 @@
+[package]
+name = "latex-remixicon"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lightningcss = "^1.0.0-alpha.60"
+
+[[bin]]
+name = "latex-remixicon"
+path = "main.rs"
