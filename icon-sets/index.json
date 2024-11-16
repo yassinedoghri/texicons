@@ -1,0 +1,16 @@
+{
+    "ri" : {
+        "name": "RemixIcon",
+        "font_folder": "fonts",
+        "font_name": "remixicon.ttf",
+        "reference_path": "fonts/remixicon.css",
+        "regex": "\\.ri-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "material-symbol": {
+        "name": "material-design-icons",
+        "font_folder": "font",
+        "font_name": "MaterialIcons-Regular.ttf",
+        "reference_path": "font/MaterialIcons-Regular.codepoints",
+        "regex": "([a-z0-9_]*) ([a-z0-9]*)"
+    }
+}

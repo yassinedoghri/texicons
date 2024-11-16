@@ -1,3 +1,3 @@
-# LaTeX RemixIcon
+# TeXicons
 
-LaTeX mappings for RemixIcon symbols.
+LaTeX mappings for various open source icon sets.

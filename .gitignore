@@ -1,2 +1,3 @@
 /target
-remixicon.sty
+/packages/*
+!/packages/texicons.sty
