@@ -1,16 +1,20 @@
 {
-    "ri" : {
-        "name": "RemixIcon",
-        "font_folder": "fonts",
+    "ri": {
+        "name": "Remix Icon",
+        "version": "4.5.0",
+        "font_url": "https://raw.githubusercontent.com/Remix-Design/RemixIcon/refs/tags/v4.5.0/fonts/remixicon.ttf",
         "font_name": "remixicon.ttf",
-        "reference_path": "fonts/remixicon.css",
+        "codepoints_url": "https://raw.githubusercontent.com/Remix-Design/RemixIcon/refs/tags/v4.5.0/fonts/remixicon.css",
+        "codepoints_name": "remixicon.css",
         "regex": "\\.ri-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
     },
-    "material-symbol": {
-        "name": "material-design-icons",
-        "font_folder": "font",
+    "material-symbols": {
+        "name": "Material Symbols",
+        "version": "main",
+        "font_url": "https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/font/MaterialIcons-Regular.ttf",
         "font_name": "MaterialIcons-Regular.ttf",
-        "reference_path": "font/MaterialIcons-Regular.codepoints",
+        "codepoints_url": "https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/font/MaterialIcons-Regular.codepoints",
+        "codepoints_name": "MaterialIcons-Regular.codepoints",
         "regex": "([a-z0-9_]*) ([a-z0-9]*)"
     }
 }

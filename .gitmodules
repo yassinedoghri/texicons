@@ -1,6 +1,0 @@
-[submodule "icon-sets/RemixIcon"]
-	path = icon-sets/RemixIcon
-	url = git@github.com:Remix-Design/RemixIcon.git
-[submodule "icon-sets/material-design-icons"]
-	path = icon-sets/material-design-icons
-	url = git@github.com:google/material-design-icons.git
