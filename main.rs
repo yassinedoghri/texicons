@@ -4,11 +4,6 @@ use regex::Regex;
 use serde::Deserialize;
 use std::{collections::HashMap, fs, path};
 
-#[cfg(windows)]
-const LINE_ENDING: &'static str = "\r\n";
-#[cfg(not(windows))]
-const LINE_ENDING: &'static str = "\n";
-
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
@@ -31,6 +26,16 @@ struct IconSet {
     codepoints_url: String,
     codepoints_name: String,
     regex: String,
+    variants: Option<HashMap<String, Variant>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Variant {
+    font_url: String,
+    font_name: String,
+    codepoints_url: String,
+    codepoints_name: String,
+    regex: String,
 }
 
 #[tokio::main]
@@ -42,6 +47,8 @@ async fn main() {
 
     let icon_sets: HashMap<String, IconSet> =
         serde_json::from_str(icon_set_index.as_str()).expect("JSON was not well-formatted");
+
+    println!("{:?}", icon_sets);
 
     match args.command {
         Commands::DownloadIconSets => download_icon_sets(&icon_sets).await,
@@ -67,53 +74,80 @@ async fn download_icon_sets(icon_sets: &HashMap<String, IconSet>) {
             ),
         )
         .await;
+
+        if icon_set.variants.is_none() {
+            continue;
+        }
+
+        for (_, icon_set_variant) in icon_set.variants.as_ref().unwrap().iter() {
+            download_file(
+                &icon_set_variant.font_url,
+                format!(
+                    "./icon-sets/{}/{}",
+                    &icon_set_key, &icon_set_variant.font_name
+                ),
+            )
+            .await;
+
+            download_file(
+                &icon_set_variant.codepoints_url,
+                format!(
+                    "./icon-sets/{}/{}",
+                    &icon_set_key, &icon_set_variant.codepoints_name
+                ),
+            )
+            .await;
+        }
     }
 }
 
 fn generate_packages(icon_sets: &HashMap<String, IconSet>) {
     for (icon_set_key, icon_set) in icon_sets.into_iter() {
+        let package_heading = format!(
+            "\\NeedsTeXFormat{{LaTeX2e}}
+\\ProvidesPackage{{{}}}[2024/11/13 TeXicons set for {}]
+\\usepackage{{fonticon_set_variant_keyspec}}",
+            ["texicons", &icon_set_key].join("-"),
+            &icon_set.name
+        );
+
         println!("{:?}{:?}", icon_set_key, icon_set.regex);
         let re = Regex::new(&icon_set.regex).unwrap();
 
-        let style_contents =
+        let codepoints_contents =
             fs::read_to_string(["./icon-sets", &icon_set_key, &icon_set.codepoints_name].join("/"))
                 .expect("Should have been able to read the file");
 
         let mut results = vec![];
 
-        for (_, [name, symbol]) in re.captures_iter(&style_contents).map(|c| c.extract()) {
+        for (_, [name, symbol]) in re.captures_iter(&codepoints_contents).map(|c| c.extract()) {
             results.push((name.to_case(Case::Kebab), symbol.to_uppercase()));
         }
 
-        let heading = format!(
-            "\\NeedsTeXFormat{{LaTeX2e}}
-\\ProvidesPackage{{{}}}[2024/11/13 TeXicons set for {}]
-\\usepackage{{fontspec}}
-
-\\newfontfamily{{\\{}Font}}{{{}}}
-
-",
-            ["texicons", &icon_set_key].join("-"),
-            &icon_set.name,
+        let mut font_families = vec![format!(
+            "\\newfontfamily{{\\{}Font}}{{{}}}",
             &icon_set_key.to_case(Case::Camel),
             &icon_set.font_name
-        );
+        )];
 
-        let mut mappings: String = String::from("");
+        let mut mappings = vec![];
         for (name, symbol) in results {
-            mappings = format!(
-                r#"{}\expandafter\def\csname icon@{}:{}\endcsname {{\{}Font \symbol{{"{}}}}}{}"#,
-                mappings.to_string(),
+            mappings.push(format!(
+                r#"\expandafter\def\csname icon@{}:{}\endcsname {{\{}Font \symbol{{"{}}}}}"#,
                 &icon_set_key,
                 name,
                 &icon_set_key.to_case(Case::Camel),
                 symbol,
-                LINE_ENDING
-            );
+            ));
         }
 
+        println!(
+            "{:?}",
+            format!("./icon-sets/{}/{}", &icon_set_key, &icon_set.font_name),
+        );
+
         let file_path = format!(
-            "./packages/{}/{}.sty",
+            "./packages/texicons-{}/{}.sty",
             &icon_set_key,
             ["texicons", &icon_set_key].join("-")
         );
@@ -121,15 +155,83 @@ fn generate_packages(icon_sets: &HashMap<String, IconSet>) {
 
         fs::create_dir_all(path.parent().unwrap()).unwrap();
 
-        fs::write(path, [heading.to_string(), mappings].join(LINE_ENDING))
-            .expect("Unable to write file");
-
         // copy font to package folder
         fs::copy(
             format!("./icon-sets/{}/{}", &icon_set_key, &icon_set.font_name),
-            format!("./packages/{}/{}", &icon_set_key, &icon_set.font_name),
+            format!(
+                "./packages/texicons-{}/{}",
+                &icon_set_key, &icon_set.font_name
+            ),
         )
         .expect("Unable to copy font file");
+
+        if !icon_set.variants.is_none() {
+            for (icon_set_variant_key, icon_set_variant) in
+                icon_set.variants.as_ref().unwrap().iter()
+            {
+                let re = Regex::new(&icon_set_variant.regex).unwrap();
+
+                let codepoints_contents = fs::read_to_string(
+                    [
+                        "./icon-sets",
+                        &icon_set_key,
+                        &icon_set_variant.codepoints_name,
+                    ]
+                    .join("/"),
+                )
+                .expect("Should have been able to read the file");
+
+                let mut results = vec![];
+
+                for (_, [name, symbol]) in
+                    re.captures_iter(&codepoints_contents).map(|c| c.extract())
+                {
+                    results.push((name.to_case(Case::Kebab), symbol.to_uppercase()));
+                }
+
+                let camel_cased_font_name =
+                    format!("{}-{}", &icon_set_key, &icon_set_variant_key).to_case(Case::Camel);
+
+                font_families.push(format!(
+                    "\\newfontfamily{{\\{}Font}}{{{}}}",
+                    &camel_cased_font_name, &icon_set_variant.font_name
+                ));
+
+                for (name, symbol) in results {
+                    mappings.push(format!(
+                        r#"\expandafter\def\csname icon@{}:{}\endcsname {{\{}Font \symbol{{"{}}}}}"#,
+                        &icon_set_key,
+                        [name, icon_set_variant_key.to_string()].join("-"),
+                        &camel_cased_font_name,
+                        symbol,
+                    ));
+                }
+
+                // copy variant font to package folder
+                fs::copy(
+                    format!(
+                        "./icon-sets/{}/{}",
+                        &icon_set_key, &icon_set_variant.font_name
+                    ),
+                    format!(
+                        "./packages/texicons-{}/{}",
+                        &icon_set_key, &icon_set_variant.font_name
+                    ),
+                )
+                .expect("Unable to copy font file");
+            }
+        }
+
+        fs::write(
+            path,
+            [
+                package_heading.to_string(),
+                font_families.join("\n"),
+                mappings.join("\n"),
+            ]
+            .join("\n\n"),
+        )
+        .expect("Unable to write file");
     }
 }
 

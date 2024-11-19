@@ -1,12 +1,48 @@
 {
-    "ri": {
-        "name": "Remix Icon",
-        "version": "4.5.0",
-        "font_url": "https://raw.githubusercontent.com/Remix-Design/RemixIcon/refs/tags/v4.5.0/fonts/remixicon.ttf",
-        "font_name": "remixicon.ttf",
-        "codepoints_url": "https://raw.githubusercontent.com/Remix-Design/RemixIcon/refs/tags/v4.5.0/fonts/remixicon.css",
-        "codepoints_name": "remixicon.css",
-        "regex": "\\.ri-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    "akar-icons": {
+        "name": "Akar Icons",
+        "version": "1.1.0",
+        "font_url": "https://raw.githubusercontent.com/artcoholic/akar-icons-fonts/refs/tags/v1.1.0/src/fonts/akar-icons.ttf",
+        "font_name": "akar-icons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/artcoholic/akar-icons-fonts/refs/tags/v1.1.0/src/css/akar-icons.css",
+        "codepoints_name": "akar-icons.css",
+        "regex": "\\.ai-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "bx": {
+        "name": "BoxIcons",
+        "version": "master",
+        "font_url": "https://raw.githubusercontent.com/atisawd/boxicons/refs/heads/master/fonts/boxicons.ttf",
+        "font_name": "boxicons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/atisawd/boxicons/refs/heads/master/css/boxicons.css",
+        "codepoints_name": "boxicons.css",
+        "regex": "\\.bx-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "bxl": {
+        "name": "BoxIcons Logos",
+        "version": "master",
+        "font_url": "https://raw.githubusercontent.com/atisawd/boxicons/refs/heads/master/fonts/boxicons.ttf",
+        "font_name": "boxicons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/atisawd/boxicons/refs/heads/master/css/boxicons.css",
+        "codepoints_name": "boxicons.css",
+        "regex": "\\.bxl-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "bxs": {
+        "name": "BoxIcons Solid",
+        "version": "master",
+        "font_url": "https://raw.githubusercontent.com/atisawd/boxicons/refs/heads/master/fonts/boxicons.ttf",
+        "font_name": "boxicons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/atisawd/boxicons/refs/heads/master/css/boxicons.css",
+        "codepoints_name": "boxicons.css",
+        "regex": "\\.bxs-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "ci": {
+        "name": "coolicons",
+        "version": "4.1",
+        "font_url": "https://raw.githubusercontent.com/krystonschwarze/coolicons/refs/tags/v4.1/Webfont/fonts/coolicons.ttf",
+        "font_name": "coolicons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/krystonschwarze/coolicons/refs/tags/v4.1/Webfont/coolicons.css",
+        "codepoints_name": "coolicons.css",
+        "regex": "\\.ci-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
     },
     "material-symbols": {
         "name": "Material Symbols",
@@ -16,5 +52,68 @@
         "codepoints_url": "https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/font/MaterialIcons-Regular.codepoints",
         "codepoints_name": "MaterialIcons-Regular.codepoints",
         "regex": "([a-z0-9_]*) ([a-z0-9]*)"
+    },
+    "mingcute": {
+        "name": "MingCute Icon",
+        "version": "2.95",
+        "font_url": "https://raw.githubusercontent.com/Richard9394/MingCute/refs/tags/v2.95/fonts/MingCute.ttf",
+        "font_name": "MingCute.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/Richard9394/MingCute/refs/tags/v2.95/fonts/MingCute.css",
+        "codepoints_name": "MingCute.css",
+        "regex": "\\.mgc_([a-zA-Z0-9_]*):before[\\S\\s]*\\{[\\S\\s]*content:[\\S\\s]*\"\\\\([a-z0-9]*)\""
+    },
+    "mynaui": {
+        "name": "Myna UI Icons",
+        "version": "0.3.1",
+        "font_url": "https://raw.githubusercontent.com/praveenjuge/mynaui-icons/refs/tags/v0.3.1/packages/icons/mynaui.ttf",
+        "font_name": "mynaui.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/praveenjuge/mynaui-icons/refs/tags/v0.3.1/packages/icons/mynaui.css",
+        "codepoints_name": "mynaui.css",
+        "regex": "\\.mynaui-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\"",
+        "variants": {
+            "solid": {
+                "font_url": "https://raw.githubusercontent.com/praveenjuge/mynaui-icons/refs/tags/v0.3.1/packages/icons/mynaui-solid.ttf",
+                "font_name": "mynaui-solid.ttf",
+                "codepoints_url": "https://raw.githubusercontent.com/praveenjuge/mynaui-icons/refs/tags/v0.3.1/packages/icons/mynaui-solid.css",
+                "codepoints_name": "mynaui-solid.css",
+                "regex": "\\.mynaui-solid-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+            }
+        }
+    },
+    "ri": {
+        "name": "Remix Icon",
+        "version": "4.5.0",
+        "font_url": "https://raw.githubusercontent.com/Remix-Design/RemixIcon/refs/tags/v4.5.0/fonts/remixicon.ttf",
+        "font_name": "remixicon.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/Remix-Design/RemixIcon/refs/tags/v4.5.0/fonts/remixicon.css",
+        "codepoints_name": "remixicon.css",
+        "regex": "\\.ri-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "tabler": {
+        "name": "Tabler Icons",
+        "version": "3.22.0",
+        "font_url": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/fonts/tabler-icons.ttf",
+        "font_name": "tabler-icons.ttf",
+        "codepoints_url": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css",
+        "codepoints_name": "tabler-icons.css",
+        "regex": "\\.ti-([a-zA-Z0-9-]*):before\\{content:\"\\\\([a-z0-9]*)\""
+    },
+    "proicons": {
+        "name": "ProIcons",
+        "version": "4.11.1",
+        "font_url": "https://raw.githubusercontent.com/ProCode-Software/proicons/refs/tags/4.11.1/icons/fonts/ProIcons.css",
+        "font_name": "ProIcons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/ProCode-Software/proicons/refs/tags/4.11.1/icons/fonts/ProIcons.css",
+        "codepoints_name": "ProIcons.css",
+        "regex": "\\.proicon-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
+    },
+    "typcn": {
+        "name": "Typicons",
+        "version": "2.1.2",
+        "font_url": "https://raw.githubusercontent.com/stephenhutchings/typicons.font/refs/tags/v2.1.2/src/font/typicons.ttf",
+        "font_name": "typicons.ttf",
+        "codepoints_url": "https://raw.githubusercontent.com/stephenhutchings/typicons.font/refs/tags/v2.1.2/src/font/typicons.css",
+        "codepoints_name": "typicons.css",
+        "regex": "\\.typcn-([a-zA-Z0-9-]*):before[\\S\\s]\\{[\\S\\s]content:[\\S\\s]\"\\\\([a-z0-9]*)\""
     }
 }
