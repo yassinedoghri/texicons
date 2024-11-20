@@ -1,0 +1,3 @@
+[submodule "icon-sets"]
+	path = icon-sets
+	url = git@github.com:iconify/icon-sets.git

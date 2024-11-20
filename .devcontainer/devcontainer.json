@@ -12,7 +12,8 @@
 		"ghcr.io/guiyomh/features/vim:0": {},
 		"ghcr.io/prulloac/devcontainer-features/latex:1": {
 			"packages": "latexindent"
-		}
+		},
+		"ghcr.io/devcontainers-community/features/deno:1": {}
 	},
 	// Configure tool-specific properties.
 	"customizations": {

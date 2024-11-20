@@ -1,6 +1,7 @@
 /target
+
 /packages/*
 !/packages/texicons.sty
 
-/icon-sets/*
-!/icon-sets/index.json
+/fonts/*
+!/fonts/gitkeep
