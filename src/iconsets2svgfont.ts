@@ -1,6 +1,7 @@
 import { createWriteStream } from "node:fs";
 import { Readable } from "node:stream";
 import { SVGIcons2SVGFontStream } from "svgicons2svgfont";
+import { optimize } from "svgo";
 
 async function getJson(filePath: string) {
   return JSON.parse(await Deno.readTextFile(filePath));
@@ -48,15 +49,22 @@ for await (const dirEntry of Deno.readDir("./icon-sets/json")) {
     const height = iconSetData.icons[iconName].height ?? iconSetData.height ??
       24;
 
-    // console.log(
-    //   iconSetData.icons[iconName].width === undefined ? iconName : "",
-    // );
-
-    const glyph = Readable.from(
+    // optimize SVG with svgo before writing to fontStream
+    const result = optimize(
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">${
         iconSetData.icons[iconName].body
       }</svg>`,
+      {
+        plugins: [
+          "preset-default",
+          "mergePaths",
+        ],
+      },
     );
+
+    const optimizedSvgString = result.data;
+
+    const glyph = Readable.from(optimizedSvgString);
 
     // @ts-ignore
     glyph.metadata = {

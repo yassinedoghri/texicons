@@ -6,6 +6,7 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
     "svg2ttf": "npm:svg2ttf@^6.0.3",
-    "svgicons2svgfont": "npm:svgicons2svgfont@^15.0.0"
+    "svgicons2svgfont": "npm:svgicons2svgfont@^15.0.0",
+    "svgo": "npm:svgo@^3.3.2"
   }
 }
