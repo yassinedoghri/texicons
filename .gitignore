@@ -3,5 +3,11 @@
 /packages/*
 !/packages/texicons.sty
 
-/fonts/*
-!/fonts/gitkeep
+/temp/fonts/*
+!/temp/fonts/.gitkeep
+
+/temp/icon-sets/*
+!/temp/icon-sets/.gitkeep
+
+.allow
+.disallow

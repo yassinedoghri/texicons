@@ -1,20 +1,24 @@
-import { createWriteStream } from "node:fs";
+import { createWriteStream, readFileSync } from "node:fs";
 import { Readable } from "node:stream";
 import { SVGIcons2SVGFontStream } from "svgicons2svgfont";
 import { optimize } from "svgo";
+
+const allowList = readFileSync(".allow").toString().split("\n").filter(
+  (line) => line,
+);
 
 async function getJson(filePath: string) {
   return JSON.parse(await Deno.readTextFile(filePath));
 }
 
-for await (const dirEntry of Deno.readDir("./icon-sets/json")) {
-  const iconSetData = await getJson("./icon-sets/json/" + dirEntry.name);
+for await (const dirEntry of Deno.readDir("./temp/icon-sets")) {
+  if (!dirEntry.name.endsWith(".json")) {
+    continue;
+  }
 
-  if (
-    ["devicon-plain", "emblemicons"].includes(
-      iconSetData.prefix,
-    )
-  ) {
+  const iconSetData = await getJson("./temp/icon-sets/" + dirEntry.name);
+
+  if (allowList.length > 0 && !allowList.includes(iconSetData.prefix)) {
     continue;
   }
 
@@ -22,7 +26,7 @@ for await (const dirEntry of Deno.readDir("./icon-sets/json")) {
     fontName: iconSetData.prefix,
   });
   const codepointsStream = createWriteStream(
-    `fonts/${iconSetData.prefix}.codepoints`,
+    `./temp/fonts/${iconSetData.prefix}.codepoints`,
   ).on("finish", function () {
     console.log(
       `Code points ${iconSetData.prefix}.codepoints successfully created!`,
@@ -34,7 +38,7 @@ for await (const dirEntry of Deno.readDir("./icon-sets/json")) {
 
   // Setting the font destination
   fontStream
-    .pipe(createWriteStream(`fonts/${iconSetData.prefix}.svg`))
+    .pipe(createWriteStream(`./temp/fonts/${iconSetData.prefix}.svg`))
     .on("finish", function () {
       console.log(`Font ${iconSetData.prefix}.svg successfully created!`);
     })
@@ -44,16 +48,9 @@ for await (const dirEntry of Deno.readDir("./icon-sets/json")) {
 
   let codePoint = 0xE000;
   for (const iconName in iconSetData.icons) {
-    // FIXME: some icon sets do not define width or height (24 by default?)
-    const width = iconSetData.icons[iconName].width ?? iconSetData.width ?? 24;
-    const height = iconSetData.icons[iconName].height ?? iconSetData.height ??
-      24;
-
     // optimize SVG with svgo before writing to fontStream
     const result = optimize(
-      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">${
-        iconSetData.icons[iconName].body
-      }</svg>`,
+      iconSetData.icons[iconName],
       {
         plugins: [
           "preset-default",
