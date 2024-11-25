@@ -25,16 +25,6 @@ for await (const dirEntry of Deno.readDir("./temp/icon-sets")) {
   const fontStream = new SVGIcons2SVGFontStream({
     fontName: iconSetData.prefix,
   });
-  const codepointsStream = createWriteStream(
-    `./temp/fonts/${iconSetData.prefix}.codepoints`,
-  ).on("finish", function () {
-    console.log(
-      `Code points ${iconSetData.prefix}.codepoints successfully created!`,
-    );
-  })
-    .on("error", function (err) {
-      console.log(`Error when creating ${iconSetData.prefix}.codepoints`, err);
-    });
 
   // Setting the font destination
   fontStream
@@ -46,11 +36,10 @@ for await (const dirEntry of Deno.readDir("./temp/icon-sets")) {
       console.log(`Error when creating ${iconSetData.prefix}.svg`, err);
     });
 
-  let codePoint = 0xE000;
   for (const iconName in iconSetData.icons) {
     // optimize SVG with svgo before writing to fontStream
     const result = optimize(
-      iconSetData.icons[iconName],
+      iconSetData.icons[iconName].svg,
       {
         plugins: [
           "preset-default",
@@ -66,16 +55,12 @@ for await (const dirEntry of Deno.readDir("./temp/icon-sets")) {
     // @ts-ignore
     glyph.metadata = {
       name: iconName,
-      unicode: [String.fromCodePoint(codePoint)],
+      unicode: [String.fromCodePoint(
+        parseInt(iconSetData.icons[iconName].codepoint, 16),
+      )],
     };
-
     fontStream.write(glyph);
-    codepointsStream.write(`${iconName} ${codePoint.toString(16)}\n`);
-
-    codePoint++;
   }
 
-  // End streams
   fontStream.end();
-  codepointsStream.end();
 }

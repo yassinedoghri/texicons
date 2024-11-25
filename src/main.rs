@@ -1,10 +1,10 @@
+use chrono::Utc;
 use clap::{Parser, Subcommand};
 use convert_case::{Case, Casing};
 use log::warn;
-use regex::Regex;
+use ordermap::OrderMap;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
     fs::{self, File},
     io::BufWriter,
     path,
@@ -28,7 +28,7 @@ enum Commands {
 struct IconSet {
     prefix: String,
     info: IconSetInfo,
-    icons: HashMap<String, Icon>,
+    icons: OrderMap<String, Icon>,
     height: Option<f32>,
     width: Option<f32>,
 }
@@ -51,8 +51,15 @@ struct Icon {
 struct TexIconSet {
     prefix: String,
     name: String,
+    font_id: String,
     version: Option<String>,
-    icons: HashMap<String, String>,
+    icons: OrderMap<String, TexIcon>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct TexIcon {
+    codepoint: String,
+    svg: String,
 }
 
 macro_rules! skip_fail {
@@ -117,12 +124,14 @@ fn clean_icon_sets(allow_list: &Vec<String>, disallow_list: &Vec<String>) {
         let mut tex_icon_set: TexIconSet = TexIconSet {
             prefix: icon_set.prefix.clone(),
             name: icon_set.info.name,
+            font_id: replace_numbers_to_letters(&icon_set.prefix).to_case(Case::Camel),
             version: icon_set.info.version,
-            icons: HashMap::new(),
+            icons: OrderMap::new(),
         };
 
         let opt = usvg::Options::default();
         let write_opt = usvg::WriteOptions::default();
+        let mut codepoint: u32 = 0xE000;
         for (name, icon) in icon_set.icons {
             println!("{:?}:{:?}", &icon_set.prefix, name);
             let width = icon
@@ -145,7 +154,14 @@ fn clean_icon_sets(allow_list: &Vec<String>, disallow_list: &Vec<String>) {
             // TODO: flag if error with empty svg (or original malformed svg?)
             let tree = skip_fail!(usvg::Tree::from_str(&svg, &opt));
 
-            tex_icon_set.icons.insert(name, tree.to_string(&write_opt));
+            tex_icon_set.icons.insert(
+                name,
+                TexIcon {
+                    svg: tree.to_string(&write_opt),
+                    codepoint: format!("{:X}", codepoint),
+                },
+            );
+            codepoint = codepoint + 1;
         }
 
         let file = File::create(format!("./temp/icon-sets/{}.json", &icon_set.prefix)).unwrap();
@@ -178,45 +194,30 @@ fn generate_packages(allow_list: &Vec<String>, disallow_list: &Vec<String>) {
             continue;
         }
 
-        let package_heading = format!(
-            "\\NeedsTeXFormat{{LaTeX2e}}
-\\ProvidesPackage{{{}}}[2024/11/13 TeXicons set for {}]
-\\usepackage{{fontspec}}
-
-\\newfontfamily{{\\{}Font}}{{{}.ttf}}",
-            ["texicons", &icon_set.prefix].join("-"),
-            match &icon_set.version {
-                None => icon_set.name,
-                Some(version) => format!("{} v{}", &icon_set.name, version),
-            },
-            &icon_set.prefix.to_case(Case::Camel),
-            &icon_set.prefix
-        );
-
         println!("{:?}", icon_set.prefix);
 
-        let re = Regex::new("([a-z0-9-]+) ([a-z0-9]+)").unwrap();
-
-        let codepoints_contents =
-            fs::read_to_string(format!("./temp/fonts/{}.codepoints", &icon_set.prefix))
-                .expect("Should have been able to read the file");
-
-        let mut results = vec![];
-
-        for (_, [name, symbol]) in re.captures_iter(&codepoints_contents).map(|c| c.extract()) {
-            results.push((name, symbol.to_uppercase()));
-        }
-
         let mut mappings = vec![];
-        for (name, symbol) in results {
+        let mut docs_table_rows = vec![];
+        for (name, tex_icon) in &icon_set.icons {
             mappings.push(format!(
-                r#"\expandafter\def\csname icon@{}:{}\endcsname {{\{}Font \symbol{{"{}}}}}"#,
-                &icon_set.prefix,
-                name,
-                &icon_set.prefix.to_case(Case::Camel),
-                symbol,
+                include_str!("./templates/mapping.tmpl"),
+                prefix = &icon_set.prefix,
+                name = name,
+                font_id = &icon_set.font_id,
+                codepoint = &tex_icon.codepoint,
+            ));
+            docs_table_rows.push(format!(
+                include_str!("./templates/docs-table_row.tmpl"),
+                prefix = &icon_set.prefix,
+                name = name,
             ));
         }
+
+        let docs = format!(
+            include_str!("./templates/docs.tex.tmpl"),
+            prefix = &icon_set.prefix,
+            rows = docs_table_rows.join("\n")
+        );
 
         let file_path = format!(
             "./packages/texicons-{}/{}.sty",
@@ -238,9 +239,55 @@ fn generate_packages(allow_list: &Vec<String>, disallow_list: &Vec<String>) {
         .expect("Unable to copy font file");
 
         fs::write(
+            format!(
+                "./packages/texicons-{}/{}.tex",
+                &icon_set.prefix,
+                ["texicons", &icon_set.prefix].join("-")
+            ),
+            docs,
+        )
+        .expect("Unable to write file");
+
+        fs::write(
             path,
-            [package_heading.to_string(), mappings.join("\n")].join("\n\n"),
+            format!(
+                include_str!("./templates/package.sty.tmpl"),
+                prefix = &icon_set.prefix,
+                date = Utc::now().format("%Y-%m-%d"),
+                info = match &icon_set.version {
+                    None => icon_set.name,
+                    Some(version) => format!("{} v{}", &icon_set.name, version),
+                },
+                font_id = &icon_set.font_id,
+                mappings = mappings.join("\n"),
+            ),
         )
         .expect("Unable to write file");
     }
+}
+
+fn replace_numbers_to_letters(input: &str) -> String {
+    let mut result = String::with_capacity(input.len());
+    for c in input.chars() {
+        let next_char;
+        if c.is_numeric() {
+            next_char = match c {
+                '1' => 'l',
+                '2' => 'a',
+                '3' => 't',
+                '4' => 'e',
+                '5' => 'x',
+                '6' => 'i',
+                '7' => 'c',
+                '8' => 'o',
+                '9' => 'n',
+                _ => 's',
+            };
+        } else {
+            next_char = c;
+        }
+        result.push(next_char);
+    }
+
+    result
 }

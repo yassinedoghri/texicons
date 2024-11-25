@@ -1,6 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{texicons}[2024/11/13 Base TeXicons package to be used with icon sets]
 
+\usepackage{xcolor}
+
 \newcommand{\icon}[2][.]{
     \textcolor{#1}
     {{\csname icon@#2\endcsname}}

@@ -21,16 +21,20 @@ for await (const dirEntry of Deno.readDir("./temp/icon-sets")) {
         continue;
     }
 
-    const svgFontContents = readFileSync(
-        `./temp/fonts/${iconSetData.prefix}.svg`,
-    );
+    try {
+        const svgFontContents = readFileSync(
+            `./temp/fonts/${iconSetData.prefix}.svg`,
+        );
 
-    const ttf = svg2ttf(svgFontContents.toString(), {});
+        const ttf = svg2ttf(svgFontContents.toString(), {});
 
-    writeFileSync(
-        `./temp/fonts/${iconSetData.prefix}.ttf`,
-        new Buffer(ttf.buffer),
-    );
+        writeFileSync(
+            `./temp/fonts/${iconSetData.prefix}.ttf`,
+            Buffer.from(ttf.buffer),
+        );
 
-    console.log(`TTF file ${iconSetData.prefix}.ttf successfully created!`);
+        console.log(`TTF file ${iconSetData.prefix}.ttf successfully created!`);
+    } catch {
+        continue;
+    }
 }
